@@ -53,17 +53,24 @@ Voici les **outils et technologies** qui seront utilisés pour ce projet :
 
 #### **Phase 2 : Mise en place des machines virtuelles et environnement de test (intermédiaire)**
 
-1. **Installer Proxmox**  
-   - Installer **Proxmox** sur un serveur ou une machine dédiée pour gérer les VMs.
-   - Créer les machines virtuelles suivantes :  
-     - **Kali Linux** (machine attaquante).  
-     - **Metasploitable / Ubuntu / Debian** (machine vulnérable).  
-     - **pfSense** (pare-feu).
+1. **Installer sur le serveur CTF :**
+   - fail2ban pour SSH (même désactivé, il peut logguer les tentatives).
+```
+sudo dnf install epel-release -y
+sudo dnf install fail2ban -y
 
-2. **Configurer le réseau avec pfSense**
-   - **pfSense** servira à filtrer et surveiller le trafic réseau entre les différentes VMs.
-   - Configurer pfSense pour analyser le trafic réseau et bloquer certaines attaques (par exemple, attaques par brute force sur SSH).
-   - Connecter les VMs à pfSense pour contrôler le trafic entrant et sortant.
+#demarrer le service 
+sudo systemctl enable --now fail2ban
+```
+   - iptables-persistent pour bloquer/réinitialiser proprement les règles.
+   - logwatch ou journalctl pour surveiller les accès.
+   - Créer des scripts de log pour repérer les IP suspectes.
+
+2. **2. 🔐 Sécurisation du serveur**
+Désactiver SSH ou le restreindre (fail2ban, port knocking, IP whitelist).
+Configurer iptables ou ufw pour ne laisser que le port web (80/443).
+Ajouter un reverse proxy avec Nginx et activer HTTPS (Let's Encrypt ou self-signed cert).
+Empêcher le ping, bloquer tout sauf HTTP/HTTPS.
 
 3. **Vérification**
    - Tester le réseau en lançant des attaques simples depuis Kali Linux (par exemple, un scan nmap) et s'assurer que pfSense bloque ou logge les connexions.
