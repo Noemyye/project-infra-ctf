@@ -79,3 +79,40 @@ Ce projet montre :
 - Tes compétences en virtualisation, configuration réseau, sécurité, et scripting
 
 - Une mise en œuvre réaliste des outils professionnels : firewall, IDS, gestion des accès
+
+
+--- 
+
+# Critère
+
+### ✅ ADMINISTRER UN SERVEUR
+| Critère                                 | Réponse dans le projet                                                                                  |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Installer et configurer un système**  | Installation de Rocky Linux, configuration IP, installation de CTFd                                     |
+| **Diagnostiquer et réparer un système** | Surveillance avec logwatch et analyse des tentatives d’intrusion avec journaux et outils comme Suricata |
+| **Automatiser des tâches simples**      | Scripts Bash pour hardening, backup, audit, configuration de base                                       |
+| **Déployer des services**               | Déploiement de la plateforme CTF via CTFd (avec ou sans Docker), configuration de firewalld             |
+
+
+### ✅ METTRE EN PLACE UNE INFRASTRUCTURE SYSTÈME ET RÉSEAU
+| Critère                                        | Réponse dans le projet                                                                                                                          |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Adressage, routage, VLAN**                   | Possibilité d’ajouter un VLAN ou une séparation réseau avec pfSense/VirtualBox selon ton setup                                                  |
+| **Haute disponibilité / Tolérance aux pannes** | Non prioritaire ici, mais on peut simuler un scénario HA avec backups et redémarrage automatique des services via `systemd` ou `docker restart` |
+| **Connectivité WAN**                           | Configuration du réseau pour restreindre ou permettre l’accès WAN/HTTP au serveur via règles précises dans le pare-feu                          |
+
+
+### ✅ GÉRER UN ENVIRONNEMENT VIRTUEL
+| Critère                    | Réponse dans le projet                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Virtualiser un système** | VMs pour Rocky Linux (serveur), Kali Linux (attaquant), Ubuntu/Debian (client si besoin)                            |
+| **Virtualiser un réseau**  | Réseaux internes simulés via VirtualBox/Proxmox/VMware ; possibilité d’ajouter pfSense ou GNS3 pour aller plus loin |
+
+### ✅ APPREHENDER LA SÉCURITÉ
+
+| Critère                               | Réponse dans le projet                                                                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Terminologie sécurité**             | Mise en place de firewall, IDS, logs, audit, fail2ban/Suricata                                                                 |
+| **Connaissance de la réglementation** | (À insérer dans le rapport : RGPD, notion de confidentialité, disponibilité, intégrité)                                        |
+| **Démarche sécuritaire**              | Blocage SSH, logs détaillés, monitoring, audit, machine attaquante pour tester la robustesse                                   |
+| **Zero Trust, IAM**                   | Aucun accès par défaut, accès limité aux IP de confiance, désactivation de services inutiles, gestion des comptes utilisateurs |
