@@ -23,18 +23,85 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 
     - Configuration de l’accès local ou via VPN
 
-3. Sécurisation du serveur
-    - Suppression des accès SSH par mot de passe
+## III. Sécurisation du serveur
+    
+### 1) accès par clé uniquement
 
-    - Option 1 : accès par clé uniquement
+création d'une clé avec :
+```
+ssh-keygen
+```
 
-    - Option 2 : interdiction totale de l’accès SSH (via firewalld)
+afficher la clé public :
+```
+type $env:USERPROFILE\.ssh\id_rsa.pub
+```
 
-    - Ajout de règles de pare-feu :
+sur le serveur rocky :
+```
+mkdir -p ~/.ssh
+nano ~/.ssh/authorized_keys
+```
+    
+et la copier manuellement dans le fichier (/.ssh/authorized_keys) et lui changer les permissions pour plus de sécurité
 
-    - Refuser toutes les connexions sauf HTTP/HTTPS (CTFd)
+```
+chmod 600 ~/.ssh/authorized_keys 
+(Lecture et écriture uniquement pour le propriétaire)
 
-    - Bloquer SSH même en LAN
+chmod 700 ~/.ssh 
+(Lecture, écriture, et éxécution uniquement pour le propriétaire)
+```
+
+### 2) Suppression des accès SSH par mot de passe
+
+Se connecter au serveur Rocky avec mot de passe une dernière fois puis :
+
+```
+sudo nano /etc/ssh/sshd_config
+```
+
+Modifie (ou décommente) ces lignes :
+
+> PasswordAuthentication no
+
+> ChallengeResponseAuthentication no
+
+> UsePAM no
+
+> PubkeyAuthentication yes ⚠️
+
+redemarrer le services ssh :
+sudo systemctl restart sshd
+
+### 3) Parefeu 
+
+✅ Autoriser uniquement :
+- Le port 22 pour SSH (uniquement si encore utilisé, ou limité à certaines IP)
+
+- Le port 8000 pour CTFd
+
+```
+# Activer le firewall si ce n’est pas déjà fait
+sudo systemctl enable firewalld --now
+
+# Supprimer toutes les règles par défaut (optionnel, mais propre)
+sudo firewall-cmd --permanent --remove-service=ssh
+sudo firewall-cmd --permanent --remove-service=http
+sudo firewall-cmd --permanent --remove-service=https
+
+# Autoriser uniquement le SSH si tu l'utilises encore
+sudo firewall-cmd --permanent --add-port=22/tcp
+
+# Autoriser le port de CTFd
+sudo firewall-cmd --permanent --add-port=8000/tcp
+
+# Appliquer les règles
+sudo firewall-cmd --reload
+
+# Vérifier les règles appliquées
+sudo firewall-cmd --list-all
+```
 
 4. Installation d’outils de sécurité🔍 
     - Installation de Suricata (ou Snort) pour l’analyse du trafic
@@ -56,6 +123,8 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
     - Génération de rapports automatisés
 
     - Script Bash pour sauvegarder les logs et résumer les attaques
+
+    - Script de backup des challenges CTFd
 
 7. Bonus – Concepts avancés
     - Introduction à Zero Trust : aucune confiance accordée à aucune machine par défaut
