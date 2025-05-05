@@ -71,11 +71,11 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 
 - Script de backup automatique des logs
 
-📊 Évaluation
+### 📊 Évaluation
 Ce projet montre :
 
-Ta capacité à administrer un serveur de manière sécurisée
+- Ta capacité à administrer un serveur de manière sécurisée
 
-Tes compétences en virtualisation, configuration réseau, sécurité, et scripting
+- Tes compétences en virtualisation, configuration réseau, sécurité, et scripting
 
-Une mise en œuvre réaliste des outils professionnels : firewall, IDS, gestion des accès
+- Une mise en œuvre réaliste des outils professionnels : firewall, IDS, gestion des accès
