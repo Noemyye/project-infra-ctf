@@ -39,7 +39,45 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 4. Installation d’outils de sécurité🔍 
     - Installation de Suricata (ou Snort) pour l’analyse du trafic
 
+        ```
+        sudo dnf install epel-release -y
+
+        sudo dnf install suricata -y
+        ```
+
+     - Allumer Suricata 
+        ```
+        sudo systemctl enable --now suricata
+        ```
+    -  Modifier le fichier de logs pour ajouter la bonne interface 
+        ```
+        sudo nano /etc/sysconfig/suricata
+
+        si ça ne marche pas :
+        sudo -i
+        nano /etc/sysconfig/suricata
+
+        Modifier la ligne options pour qu'elle corresponde à ça :
+        OPTIONS="-i enp0s3"
+        ```
+
+    - Redémarrer Suricata :
+    ```
+    sudo systemctl restart suricata
+    ```
+    - Vérifier si Suricata fonctionne : 
+    ```
+    sudo systemctl status suricata
+    ```
+    ____
+
     - 🔐 Installation de logwatch pour centraliser les journaux
+    ```
+    
+
+    ```
+
+
     
     - Ajout d’un script Bash pour lancer un audit de sécurité (ex : lynis ou rkhunter)
 
@@ -74,9 +112,9 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 ### 📊 Évaluation
 Ce projet montre :
 
-- Ta capacité à administrer un serveur de manière sécurisée
+- La capacité à administrer un serveur de manière sécurisée
 
-- Tes compétences en virtualisation, configuration réseau, sécurité, et scripting
+- Les compétences en virtualisation, configuration réseau, sécurité, et scripting
 
 - Une mise en œuvre réaliste des outils professionnels : firewall, IDS, gestion des accès
 
