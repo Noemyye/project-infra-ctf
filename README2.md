@@ -6,109 +6,76 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 
 ---
 
-## 📝 Cahier des charges
+# Mi no comprendo 
 
-### 1. Serveur CTF
-- Système : Rocky Linux (VM ou machine physique)
-- Application : CTFd (plateforme d'hébergement de challenges)
-- Objectif : héberger des challenges pour des tests d’intrusion internes
+🧱 Étapes de mise en place
+1. Installation du serveur principal (Rocky Linux)
+    - Installation de Rocky Linux sur une VM (ou serveur physique)✅
 
-### 2. Sécurisation du serveur
-- Interdiction des connexions SSH (même en local)
-- Pare-feu strict
-- Outils de surveillance du réseau
+    - Configuration IP statique ✅
 
-### 3. Analyse réseau
-- Collecte de logs réseau
-- Détection d'activités suspectes
+    - Installation des outils de base (dnf, nano, wget, firewalld, etc.)
 
-### 4. Machine attaquante
-- Kali Linux (VM ou physique)
-- Utilisée pour lancer des attaques (scan, brute force, etc.)
-- Objectif : observer le comportement du serveur et analyser les logs
+2. Déploiement de la plateforme CTF
+    - Installation de CTFd (via Docker ou en local)✅
 
----
+    - Création d’un challenge simple✅
 
-## 🛠️ Étapes de mise en place
+    - Configuration de l’accès local ou via VPN
 
-### Étape 1 : Déploiement du serveur Rocky Linux
-- Télécharger l’image Rocky Linux
-- Créer une VM ou booter sur une clé USB
-- Installer le système avec un utilisateur `nono` et accès `sudo`
+3. Sécurisation du serveur
+    - Suppression des accès SSH par mot de passe
 
-### Étape 2 : Installation de CTFd
-```bash
-sudo dnf install git python3 python3-pip -y
-git clone https://github.com/CTFd/CTFd.git
-cd CTFd
-pip3 install -r requirements.txt
-python3 serve.py
-```
+    - Option 1 : accès par clé uniquement
 
-desactiver ssh 
-sudo systemctl disable --now sshd
-sudo firewall-cmd --permanent --remove-service=ssh
-sudo firewall-cmd --reload
+    - Option 2 : interdiction totale de l’accès SSH (via firewalld)
 
-parefeu
-sudo firewall-cmd --permanent --zone=public --add-port=8000/tcp
-sudo firewall-cmd --reload
+    - Ajout de règles de pare-feu :
 
-nftables
-sudo dnf install nftables -y
-sudo systemctl enable --now nftables
+    - Refuser toutes les connexions sauf HTTP/HTTPS (CTFd)
 
+    - Bloquer SSH même en LAN
 
-configurer les regles 
-sudo nano /etc/nftables.conf
+4. Installation d’outils de sécurité🔍 
+    - Installation de Suricata (ou Snort) pour l’analyse du trafic
 
-ex:
-table inet filter {
-    chain input {
-        type filter hook input priority 0;
-        policy drop;
-        iif "lo" accept
-        ct state established,related accept
-        tcp dport 8000 accept
-    }
-}
+🔐 Installation de logwatch pour centraliser les journaux
 
-puis
-sudo systemctl restart nftables
+    - Ajout d’un script Bash pour lancer un audit de sécurité (ex : lynis ou rkhunter)
 
-Étape 4 : Mise en place de la machine attaquante (Kali Linux)
-Installer Kali sur une autre VM ou PC
+5. Machine attaquante : Kali Linux
+    - Création d’une VM Kali
 
-Connecter les deux machines au même réseau
+    - Lancement de scans (nmap, nikto, hydra, dirb)
 
-Utiliser nmap, hydra, ou gobuster pour tester la surface d’attaque
-nmap -p- <IP_du_serveur>
+    - Test des règles de sécurité : SSH bloqué ? HTTP autorisé ? Détection active ?
 
-Étape 5 : Analyse et surveillance du trafic
-Utiliser tcpdump ou wireshark
+6. Journalisation et analyse
+    - Vérification des logs /var/log/secure, /var/log/messages, journaux Suricata
 
-sudo dnf install tcpdump -y
-sudo tcpdump -i <interface> -w capture.pcap
+    - Génération de rapports automatisés
 
-Analyser avec :
-wireshark
+    - Script Bash pour sauvegarder les logs et résumer les attaques
 
-logwatch (en l’installant avec : sudo dnf install logwatch)
+7. Bonus – Concepts avancés
+    - Introduction à Zero Trust : aucune confiance accordée à aucune machine par défaut
 
-✅ Résultat attendu
-Serveur CTF opérationnel avec CTFd
+    - IAM basique : ajout de rôles d’accès pour l’administration du serveur
 
-Impossible de s’y connecter en SSH même depuis le LAN
+    - Mise en place d’un VLAN si l’infrastructure réseau le permet
 
-Seul le port web du CTF est accessible
+🛠️ Automatisation
+    - Script d'installation de CTFd et de configuration du pare-feu
 
-Les attaques sont détectées et enregistrées
+    - Script de hardening (désactivation des ports, installation d’outils de log, etc.)
 
-Logs récupérables pour analyse
+    - Script de backup automatique des logs
 
-🧪 Bonus
-Mettre en place un reverse proxy (Nginx) avec HTTPS pour sécuriser l’accès web
+📊 Évaluation
+Ce projet montre :
 
-Utiliser fail2ban compilé manuellement si besoin
+Ta capacité à administrer un serveur de manière sécurisée
 
-Intégration d’un tableau de bord comme Grafana pour la visualisation
+Tes compétences en virtualisation, configuration réseau, sécurité, et scripting
+
+Une mise en œuvre réaliste des outils professionnels : firewall, IDS, gestion des accès
