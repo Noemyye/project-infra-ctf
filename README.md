@@ -4,24 +4,33 @@
 
 Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis le sécuriser afin d'empêcher tout accès non autorisé, même en réseau local. Utiliser des outils d'analyse réseau pour détecter les tentatives d'intrusion et configurer une machine Kali Linux comme attaquante pour tester la résistance du système.
 
----
+## I. Serveur principal
 
-# Mi no comprendo 
+Installation de Rocky Linux sur une VM et mise en réseau (192.168.56.1)
 
-🧱 Étapes de mise en place
-1. Installation du serveur principal (Rocky Linux)
-    - Installation de Rocky Linux sur une VM (ou serveur physique)✅
+Configuration IP statique ici **192.168.56.10**
 
-    - Configuration IP statique ✅
+Vérification et installation des outils de base (dnf, nano, wget, firewalld, etc.)
 
-    - Installation des outils de base (dnf, nano, wget, firewalld, etc.)
+Installation de **Docker** pour CTFd (voir doc de Docker)
 
-2. Déploiement de la plateforme CTF
-    - Installation de CTFd (via Docker ou en local)✅
+## II. Déploiement de la plateforme CTF
 
-    - Création d’un challenge simple✅
+**Déployer CTFd avec Docker**
+- Cloner le dépôt CTFd depuis GitHub :
+```bash
+git clone https://github.com/CTFd/CTFd.git
+cd CTFd
+sudo docker compose up -d
+```
 
-    - Configuration de l’accès local ou via VPN
+- Accéder à la plateforme via `http://localhost:8000` (ou l'IP de ton serveur 192.168.56.10 ici) et créer un compte administrateur.
+
+- Création de challenge comme tu le souhaites
+
+**Vérification :**
+
+S’assurer que la plateforme fonctionne bien et que les défis sont visibles dans l’interface d’administration.
 
 ## III. Sécurisation du serveur
     
