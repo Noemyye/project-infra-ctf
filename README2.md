@@ -39,8 +39,8 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 4. Installation d’outils de sécurité🔍 
     - Installation de Suricata (ou Snort) pour l’analyse du trafic
 
-🔐 Installation de logwatch pour centraliser les journaux
-
+    - 🔐 Installation de logwatch pour centraliser les journaux
+    
     - Ajout d’un script Bash pour lancer un audit de sécurité (ex : lynis ou rkhunter)
 
 5. Machine attaquante : Kali Linux
@@ -64,12 +64,12 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 
     - Mise en place d’un VLAN si l’infrastructure réseau le permet
 
-🛠️ Automatisation
-    - Script d'installation de CTFd et de configuration du pare-feu
+### 🛠️ Automatisation
+- Script d'installation de CTFd et de configuration du pare-feu
 
-    - Script de hardening (désactivation des ports, installation d’outils de log, etc.)
+- Script de hardening (désactivation des ports, installation d’outils de log, etc.)
 
-    - Script de backup automatique des logs
+- Script de backup automatique des logs
 
 📊 Évaluation
 Ce projet montre :
