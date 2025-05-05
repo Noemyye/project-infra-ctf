@@ -25,26 +25,25 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 
 ## III. Sécurisation du serveur
     
-### 1) accès par clé uniquement
+### 1) Accès par clé uniquement
 
-création d'une clé avec :
+Création d'une clé avec :
 ```
 ssh-keygen
 ```
 
-afficher la clé public :
+Afficher la clé public :
 ```
 type $env:USERPROFILE\.ssh\id_rsa.pub
 ```
 
-sur le serveur rocky :
+Sur le serveur rocky créer un dossier et un fichier pour sauvegarder la clé :
 ```
 mkdir -p ~/.ssh
 nano ~/.ssh/authorized_keys
 ```
     
-et la copier manuellement dans le fichier (/.ssh/authorized_keys) et lui changer les permissions pour plus de sécurité
-
+Copier manuellement la clé dans le fichier (authorized_keys) et lui changer les permissions pour plus de sécurité :
 ```
 chmod 600 ~/.ssh/authorized_keys 
 (Lecture et écriture uniquement pour le propriétaire)
@@ -56,7 +55,6 @@ chmod 700 ~/.ssh
 ### 2) Suppression des accès SSH par mot de passe
 
 Se connecter au serveur Rocky avec mot de passe une dernière fois puis :
-
 ```
 sudo nano /etc/ssh/sshd_config
 ```
@@ -69,15 +67,17 @@ Modifie (ou décommente) ces lignes :
 
 > UsePAM no
 
-> PubkeyAuthentication yes ⚠️
+> PubkeyAuthentication yes ⚠️(Très important pour autoriser la clé)
 
-redemarrer le services ssh :
+Redémarrer le services ssh pour appliquer les modifications :
+```
 sudo systemctl restart sshd
+```
 
 ### 3) Parefeu 
 
-✅ Autoriser uniquement :
-- Le port 22 pour SSH (uniquement si encore utilisé, ou limité à certaines IP)
+**✅ Autoriser uniquement :**
+- Le port 22 pour SSH 
 
 - Le port 8000 pour CTFd
 
@@ -85,12 +85,12 @@ sudo systemctl restart sshd
 # Activer le firewall si ce n’est pas déjà fait
 sudo systemctl enable firewalld --now
 
-# Supprimer toutes les règles par défaut (optionnel, mais propre)
+# Supprimer toutes les règles par défaut 
 sudo firewall-cmd --permanent --remove-service=ssh
 sudo firewall-cmd --permanent --remove-service=http
 sudo firewall-cmd --permanent --remove-service=https
 
-# Autoriser uniquement le SSH si tu l'utilises encore
+# Autoriser le SSH 
 sudo firewall-cmd --permanent --add-port=22/tcp
 
 # Autoriser le port de CTFd
@@ -103,7 +103,7 @@ sudo firewall-cmd --reload
 sudo firewall-cmd --list-all
 ```
 
-4. Installation d’outils de sécurité🔍 
+## IV. Installation d’outils de sécurité🔍 
     - Installation de Suricata (ou Snort) pour l’analyse du trafic
 
         ```
