@@ -1,136 +1,81 @@
-Voici un **cahier des charges** détaillé pour ton projet de mise en place d'un **CTF auto-hébergé avec un focus réseau, Linux et infrastructure**. Ce projet est conçu pour que tu puisses progresser à ton rythme, en commençant par des tâches simples et en ajoutant progressivement des éléments plus complexes.
+# Projet Cybersécurité : Serveur CTF sécurisé avec Rocky Linux
 
----
-Noémie Dublanc, Ingrid Lare, Maxime Isidore
----
+## 🎯 Objectif du projet
 
-## 🎯 **Cahier des charges : Projet CTF Auto-Hébergé avec Réseau, Linux et Infrastructure**
-
-### 1. **Objectif du projet**
-L’objectif est de mettre en place une plateforme de **Capture The Flag (CTF)** auto-hébergée qui permet de résoudre des défis en cybersécurité tout en intégrant un focus sur la **sécurisation du réseau**, **l’utilisation de machines Linux** et la **mise en place d’une infrastructure de surveillance**. Ce projet sera évolutif, en commençant par des éléments de base pour arriver à une architecture complète avec la gestion du trafic réseau et la détection d’intrusions.
+Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis le sécuriser afin d'empêcher tout accès non autorisé, même en réseau local. Utiliser des outils d'analyse réseau pour détecter les tentatives d'intrusion et configurer une machine Kali Linux comme attaquante pour tester la résistance du système.
 
 ---
 
-### 2. **Technologies nécessaires**
-Voici les **outils et technologies** qui seront utilisés pour ce projet :
+# Mi no comprendo 
 
-- **CTFd** : plateforme d’hébergement de CTF (permet de gérer les défis, scores, etc.).
-- **Docker** : utilisé pour déployer CTFd et des services dans un environnement isolé.
-- **Proxmox** : gestionnaire de machines virtuelles (pour isoler les différentes parties du projet).
-- **VMs** : Kali Linux (machine d'attaque), Ubuntu/Debian (machines vulnérables), pfSense (pare-feu), etc.
-- **Suricata** : IDS (Intrusion Detection System) pour surveiller les attaques réseau.
-- **Nginx** : serveur web pour héberger des services dans les machines vulnérables.
-- **Wireshark** et **Tcpdump** : pour analyser le trafic réseau.
+🧱 Étapes de mise en place
+1. Installation du serveur principal (Rocky Linux)
+    - Installation de Rocky Linux sur une VM (ou serveur physique)✅
 
----
+    - Configuration IP statique ✅
 
-### 3. **Détails des étapes du projet**
+    - Installation des outils de base (dnf, nano, wget, firewalld, etc.)
 
-#### **Phase 1 : Mise en place de la plateforme CTF (facile)**
+2. Déploiement de la plateforme CTF
+    - Installation de CTFd (via Docker ou en local)✅
 
-1. **Installer Docker sur un serveur Linux**
-   - Utiliser **Ubuntu** ou **Debian** pour le système d'exploitation du serveur.
-   - Installer Docker et Docker Compose :
-     ```
-     sudo apt update
-     (voir sur la doc de docker pour l'installer)
-     ```
+    - Création d’un challenge simple✅
 
-2. **Déployer CTFd avec Docker**
-   - Cloner le dépôt CTFd depuis GitHub :
-     ```bash
-     git clone https://github.com/CTFd/CTFd.git
-     cd CTFd
-     sudo docker compose up -d
-     ```
-   - Accéder à la plateforme via `http://localhost:8000` (ou l'IP de ton serveur 192.168.56.10 ici) et créer un compte administrateur.
-   - Ajouter des **challenges préexistants** téléchargés depuis des plateformes comme CTFtime, Vulnhub, etc.
+    - Configuration de l’accès local ou via VPN
 
-3. **Vérification**
-   - S’assurer que la plateforme fonctionne bien et que les défis sont visibles dans l’interface d’administration.
+3. Sécurisation du serveur
+    - Suppression des accès SSH par mot de passe
 
----
+    - Option 1 : accès par clé uniquement
 
-#### **Phase 2 : Mise en place des machines virtuelles et environnement de test (intermédiaire)**
+    - Option 2 : interdiction totale de l’accès SSH (via firewalld)
 
-1. **Installer sur le serveur CTF :**
-   - fail2ban pour SSH (même désactivé, il peut logguer les tentatives).
-```
-sudo dnf install epel-release -y
-sudo dnf install fail2ban -y
+    - Ajout de règles de pare-feu :
 
-#demarrer le service 
-sudo systemctl enable --now fail2ban
-```
-   - iptables-persistent pour bloquer/réinitialiser proprement les règles.
-   - logwatch ou journalctl pour surveiller les accès.
-   - Créer des scripts de log pour repérer les IP suspectes.
+    - Refuser toutes les connexions sauf HTTP/HTTPS (CTFd)
 
-2. **2. 🔐 Sécurisation du serveur**
-Désactiver SSH ou le restreindre (fail2ban, port knocking, IP whitelist).
-Configurer iptables ou ufw pour ne laisser que le port web (80/443).
-Ajouter un reverse proxy avec Nginx et activer HTTPS (Let's Encrypt ou self-signed cert).
-Empêcher le ping, bloquer tout sauf HTTP/HTTPS.
+    - Bloquer SSH même en LAN
 
-3. **Vérification**
-   - Tester le réseau en lançant des attaques simples depuis Kali Linux (par exemple, un scan nmap) et s'assurer que pfSense bloque ou logge les connexions.
+4. Installation d’outils de sécurité🔍 
+    - Installation de Suricata (ou Snort) pour l’analyse du trafic
 
----
+    - 🔐 Installation de logwatch pour centraliser les journaux
+    
+    - Ajout d’un script Bash pour lancer un audit de sécurité (ex : lynis ou rkhunter)
 
-#### **Phase 3 : Sécurisation et surveillance réseau (avancé)**
+5. Machine attaquante : Kali Linux
+    - Création d’une VM Kali
 
-1. **Installer et configurer Suricata pour la détection d’intrusions**
-   - Suricata sera installé sur **pfSense** pour surveiller le trafic réseau et détecter les attaques en temps réel.
-   - Configurer des règles de base pour détecter des attaques courantes (par exemple, attaques par SQL injection, attaques par force brute, etc.).
-   - Analyser les logs générés par Suricata dans une interface comme **Kibana** ou **Grafana** pour avoir des visualisations en temps réel.
+    - Lancement de scans (nmap, nikto, hydra, dirb)
 
-2. **Ajouter des défis réseau sur CTFd**
-   - Ajouter des **challenges orientés réseau** : par exemple, des défis sur l’exploitation des services réseau, l’analyse de paquets, ou la manipulation du trafic.
-   - Les participants devront résoudre des problèmes de sécurité réseau, et ces défis peuvent être surveillés par Suricata pour voir les attaques en temps réel.
+    - Test des règles de sécurité : SSH bloqué ? HTTP autorisé ? Détection active ?
 
-3. **Analyser le trafic avec Wireshark et Tcpdump**
-   - Configurer **Wireshark** ou **Tcpdump** pour capturer le trafic réseau entre les machines.
-   - Les utilisateurs devront peut-être résoudre des défis qui incluent l’analyse d’un fichier de capture ou la détection d'une vulnérabilité exploitée via le réseau.
+6. Journalisation et analyse
+    - Vérification des logs /var/log/secure, /var/log/messages, journaux Suricata
 
-4. **Vérification**
-   - Effectuer des tests pour s'assurer que **Suricata** détecte correctement les attaques et que **pfSense** bloque ou filtre le trafic de manière adéquate.
+    - Génération de rapports automatisés
 
----
+    - Script Bash pour sauvegarder les logs et résumer les attaques
 
-### 4. **Livrables**
-À la fin du projet, tu devras obtenir :
+7. Bonus – Concepts avancés
+    - Introduction à Zero Trust : aucune confiance accordée à aucune machine par défaut
 
-- **Une plateforme CTF** fonctionnelle (CTFd) où des défis peuvent être résolus par les participants.
-- **Des machines virtuelles** configurées, dont une machine attaquante (Kali Linux) et une machine vulnérable (Ubuntu/Debian).
-- **Un pare-feu pfSense** configuré pour surveiller et filtrer le trafic réseau.
-- **Un IDS (Suricata)** installé pour détecter les attaques en temps réel et visualiser les événements dans Kibana ou Grafana.
-- Des **challenges de cybersécurité** ajoutés à la plateforme CTFd, en particulier orientés sur le réseau et les vulnérabilités des services.
+    - IAM basique : ajout de rôles d’accès pour l’administration du serveur
 
----
+    - Mise en place d’un VLAN si l’infrastructure réseau le permet
 
-### 5. **Matériel requis**
-- **Un serveur ou une machine dédiée** avec assez de mémoire (minimum 8 Go de RAM recommandé) pour faire tourner plusieurs VMs simultanément.
-- **Proxmox ou VirtualBox** pour gérer les machines virtuelles.
-- **Accès à Internet** pour télécharger les outils nécessaires (Docker, CTFd, VMs, etc.).
+### 🛠️ Automatisation
+- Script d'installation de CTFd et de configuration du pare-feu
 
----
+- Script de hardening (désactivation des ports, installation d’outils de log, etc.)
 
-### 6. **Planning estimé**
-Voici un plan de travail possible sur **2 à 3 semaines**, en fonction de ton rythme :
+- Script de backup automatique des logs
 
-- **Semaine 1** : Installer Docker et CTFd, ajouter des défis, tester la plateforme CTF.  
-- **Semaine 2** : Installer Proxmox et créer des VMs Kali Linux et Metasploitable, configurer pfSense.  
-- **Semaine 3** : Installer Suricata, ajouter des défis réseau sur CTFd, tester la surveillance et l’analyse du trafic.
+### 📊 Évaluation
+Ce projet montre :
 
----
+- Ta capacité à administrer un serveur de manière sécurisée
 
-### 7. **Points de vérification**
-- **CTFd** doit être accessible et fonctionnelle.
-- **Proxmox** doit être correctement configuré pour gérer plusieurs VMs.
-- Le **pare-feu pfSense** doit contrôler le trafic réseau.
-- **Suricata** doit être capable de détecter des attaques sur le réseau.
-- Les **défis de cybersécurité** doivent être clairs et résoudre des problèmes concrets de réseau et sécurité.
+- Tes compétences en virtualisation, configuration réseau, sécurité, et scripting
 
----
-
-Si tu as des questions ou si tu veux qu’on adapte certaines parties, n’hésite pas à me le dire ! Ce projet peut vraiment être une bonne expérience pour te plonger dans le monde de la cybersécurité. 😊
+- Une mise en œuvre réaliste des outils professionnels : firewall, IDS, gestion des accès
