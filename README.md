@@ -147,15 +147,6 @@ sudo firewall-cmd --list-all
     ```
     ____
 
-    - 🔐 Installation de logwatch pour centraliser les journaux
-    ```
-    
-
-    ```
-
-
-    
-    - Ajout d’un script Bash pour lancer un audit de sécurité (ex : lynis ou rkhunter)
 
 5. Machine attaquante : Kali Linux
     - Création d’une VM Kali
@@ -165,13 +156,31 @@ sudo firewall-cmd --list-all
     - Test des règles de sécurité : SSH bloqué ? HTTP autorisé ? Détection active ?
 
 6. Journalisation et analyse
-    - Vérification des logs /var/log/secure, /var/log/messages, journaux Suricata
+    
+    Vérification des logs /var/log/secure, /var/log/messages, journaux Suricata
+
+    ```
+    sudo less /var/log/secure
+    sudo less /var/log/messages
+    sudo less /var/log/suricata/fast.log
+    ```
 
     - Génération de rapports automatisés
+    
+        Pour générer un rapport, j'execute la commande :
 
-    - Script Bash pour sauvegarder les logs et résumer les attaques
+    ```
+    sudo logwatch --range today --detail high --service all --format text
+    ```
 
-    - Script de backup des challenges CTFd
+
+    Script Bash pour sauvegarder les logs et résumer les attaques
+    
+    - Pour générer un rapport lisible par un utilisateur non-technique :
+
+    ```
+    sudo ./rapport_resume.sh
+    ```
 
 7. Bonus – Concepts avancés
     - Introduction à Zero Trust : aucune confiance accordée à aucune machine par défaut
