@@ -19,7 +19,7 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 ### (Facultatif) Page d'accueil récapitulative
 
 Un script permet de déployer une page web statique pour l'accueil :
-- [Script bash ici](./setup_welcome_page.sh)
+- [Script bash ici](./scripts/setup_welcome_page.sh)
 ```
 ./setup_welcome_page.sh
 ```
@@ -160,7 +160,7 @@ sudo nano /usr/local/bin/check_integrity.sh
 ```
 
 Copier le contenu :
-- [Script bash ici](./check_integrity.sh)
+- [Script bash ici](./scripts/check_integrity.sh)
 
 Donne les permissions d’exécution :
 ```
@@ -202,6 +202,7 @@ sudo logwatch --range today --detail high --service all --format text
 ### 📄 Script de résumé des attaques
 
 Si un script resume_scripts.sh a été défini, vous pouvez le copier et l'utiliser comme suit :
+- [Script bash ici](./scripts/resumer_scripts.sh)
 ```bash
 sudo chmod +x resume_scripts.sh
 sudo ./resume_scripts.sh
