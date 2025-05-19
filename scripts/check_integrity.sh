@@ -6,6 +6,8 @@ FILES=(
     "/etc/firewalld"
     "/etc/nginx/nginx.conf"
     "/etc/sudoers"
+    "/etc/shadow"
+    "/etc/passwd"
 )
 
 # Répertoire de stockage des sommes de contrôle
