@@ -131,6 +131,45 @@ sudo systemctl restart suricata
 sudo systemctl status suricata
 ```
 
+### Mise en place d'un IDS simple
+
+📂 Fichiers surveillés :
+- /etc/ssh/sshd_config
+
+- /etc/firewalld
+
+- /etc/nginx/nginx.conf
+
+- /etc/sudoers
+
+Crée le fichier check_integrity.sh dans /usr/local/bin/ :
+
+```
+sudo nano /usr/local/bin/check_integrity.sh
+```
+
+Copier le script :
+-[Script bash ici](./check_integrity.sh)
+
+Donne les permissions d’exécution :
+```
+sudo chmod +x /usr/local/bin/check_integrity.sh
+```
+
+Ajoute la tâche dans cron :
+```bash
+sudo crontab -e
+
+# Copier ca
+*/5 * * * * /usr/local/bin/check_integrity.sh
+```
+
+### Logwatch en plus
+
+```bash
+sudo dnf install logwatch 
+```
+
 ---
 
 ## VI. Journalisation & Analyse
@@ -144,14 +183,6 @@ sudo less /var/log/suricata/fast.log
 ```
 
 ### 📈 Rapport quotidien
-
-Installer logwatch :
-
-```bash
-sudo dnf install logwatch 
-```
-
-Configurer logwatch :
 
 ```bash
 sudo logwatch --range today --detail high --service all --format text
