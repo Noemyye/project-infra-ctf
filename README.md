@@ -16,9 +16,10 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 
 ## II. Déploiement de la plateforme CTF
 
-### (Facultatif) Execution de la page d'accueil
+### (Facultatif) Page d'accueil récapitulative
 
-Lancer le script bash pour déployer le serveur nginx pour avoir la page d'accueil récapitulative
+Un script permet de déployer une page web statique pour l'accueil :
+- [Script bash ici](./setup_welcome_page.sh)
 ```
 ./setup_welcome_page.sh
 ```
@@ -28,11 +29,17 @@ Lancer le script bash pour déployer le serveur nginx pour avoir la page d'accue
 ```bash
 git clone https://github.com/CTFd/CTFd.git
 cd CTFd
+```
+
+Pour une maintenance de ctfd toujours en ligne ajouter dans le docker compose : `restart: always` dans le service ctfd
+
+Puis :
+```
 sudo docker compose up -d
 ```
 
 * Accès à la plateforme via `http://192.168.56.10:8000`
-* Création d'un compte administrateur
+* Création d'un compte administrateur à la première connexion
 
 ### ✅ Vérification
 
@@ -53,23 +60,26 @@ ssh-keygen
 type $env:USERPROFILE\.ssh\id_rsa.pub
 ```
 
-Sur le serveur Rocky, copier manuellement la clé public que vous venez d'afficher dans le fichier (authorized_keys) et lui changer les permissions pour plus de sécurité ::
-
+Sur le serveur Rocky Linux, copier la clé publique affichée précédemment :
 ```bash
 mkdir -p ~/.ssh
 nano ~/.ssh/authorized_keys
+```
+
+Et sécuriser les permissions :
+```
 chmod 600 ~/.ssh/authorized_keys
 chmod 700 ~/.ssh
 ```
 
 ### 2) Désactivation de l'accès SSH par mot de passe
 
+Éditez la configuration SSH :
 ```bash
 sudo nano /etc/ssh/sshd_config
 ```
 
 Modifier/Ajouter les lignes suivantes :
-
 ```
 PasswordAuthentication no
 ChallengeResponseAuthentication no
@@ -78,7 +88,6 @@ PubkeyAuthentication yes ⚠️(Très important pour autoriser la clé)
 ```
 
 Redémarrer le service :
-
 ```bash
 sudo systemctl restart sshd
 ```
@@ -86,6 +95,7 @@ sudo systemctl restart sshd
 ### 3) Pare-feu
 
 ```bash
+# Activation du service :
 sudo systemctl enable firewalld --now
 
 # Suppression des services par défaut
@@ -94,8 +104,9 @@ sudo firewall-cmd --permanent --remove-service=http
 sudo firewall-cmd --permanent --remove-service=https
 
 # Autoriser les ports nécessaires
-sudo firewall-cmd --permanent --add-port=22/tcp
-sudo firewall-cmd --permanent --add-port=8000/tcp
+sudo firewall-cmd --permanent --add-port=22/tcp     # SSH par clé
+sudo firewall-cmd --permanent --add-port=8080/tcp   # Port alternatif éventuel
+sudo firewall-cmd --permanent --add-port=8000/tcp   # Port de CTFd
 
 # Appliquer et vérifier
 sudo firewall-cmd --reload
@@ -114,18 +125,15 @@ sudo dnf install suricata -y
 sudo systemctl enable --now suricata
 ```
 
-Configurer l'interface réseau :
-
+Configurer l'interface réseau sur laquelle on veut vérifier (ici enp0s3):
 ```bash
-sudo -i
-nano /etc/sysconfig/suricata
+sudo nano /etc/sysconfig/suricata
 
 # Modifier la ligne options pour qu'elle corresponde à ça :
 OPTIONS="-i enp0s3"
 ```
 
 Redémarrer le service :
-
 ```bash
 sudo systemctl restart suricata
 sudo systemctl status suricata
@@ -142,32 +150,35 @@ sudo systemctl status suricata
 
 - /etc/sudoers
 
-Crée le fichier check_integrity.sh dans /usr/local/bin/ :
+- /etc/passwd
 
+- /etc/shadow
+
+Créer le script :
 ```
 sudo nano /usr/local/bin/check_integrity.sh
 ```
 
-Copier le script :
--[Script bash ici](./check_integrity.sh)
+Copier le contenu :
+- [Script bash ici](./check_integrity.sh)
 
 Donne les permissions d’exécution :
 ```
 sudo chmod +x /usr/local/bin/check_integrity.sh
 ```
 
-Ajoute la tâche dans cron :
+Planifier une vérification toutes les 5 minutes via cron :
 ```bash
 sudo crontab -e
 
-# Copier ca
+# Copier ca :
 */5 * * * * /usr/local/bin/check_integrity.sh
 ```
 
 ### Logwatch en plus
 
 ```bash
-sudo dnf install logwatch 
+sudo dnf install logwatch -y
 ```
 
 ---
@@ -182,7 +193,7 @@ sudo less /var/log/messages
 sudo less /var/log/suricata/fast.log
 ```
 
-### 📈 Rapport quotidien
+### 📈 Rapport quotidien avec logwatch
 
 ```bash
 sudo logwatch --range today --detail high --service all --format text
@@ -190,9 +201,13 @@ sudo logwatch --range today --detail high --service all --format text
 
 ### 📄 Script de résumé des attaques
 
+Si un script resume_scripts.sh a été défini, vous pouvez le copier et l'utiliser comme suit :
 ```bash
-sudo ./rapport_resume.sh
+sudo chmod +x resume_scripts.sh
+sudo ./resume_scripts.sh
 ```
+
+Puis voir le fichier log qui répertorie les connexions ssh réussis ou échoués
 
 ---
 
@@ -202,41 +217,3 @@ sudo ./rapport_resume.sh
 * **IAM** : gestion des comptes utilisateurs et accès limités
 * **VLAN** : possibilité de segmentation réseau via pfSense ou autres outils
 * **Automatisation** : Script d'installation, de hardening
-
----
-
-## 📊 Évaluation
-
-### ✅ ADMINISTRER UN SERVEUR
-
-| Critère                             | Réponse                                      |
-| ----------------------------------- | -------------------------------------------- |
-| Installer et configurer un système  | Rocky Linux, IP statique, Docker, CTFd       |
-| Diagnostiquer et réparer un système | Analyse de logs, Suricata, logwatch          |
-| Automatiser des tâches simples      | Scripts : installation, sécurisation, backup |
-| Déployer des services               | CTFd via Docker, gestion des ports           |
-
-### ✅ METTRE EN PLACE UNE INFRASTRUCTURE SYSTÈME & RÉSEAU
-
-| Critère                                | Réponse                                               |
-| -------------------------------------- | ----------------------------------------------------- |
-| Adressage, routage, VLAN               | Configuration réseau, possibilité de VLAN via pfSense |
-| Haute disponibilité / tolérance pannes | Redémarrage auto avec `systemd` ou `docker restart`   |
-| Connectivité WAN                       | Contrôle via pare-feu (ports précisément définis)     |
-
-### ✅ GÉRER UN ENVIRONNEMENT VIRTUEL
-
-| Critère               | Réponse                                                                                |
-| --------------------- | -------------------------------------------------------------------------------------- |
-| Virtualiser un OS     | VMs : Rocky Linux                                                                      |
-| Virtualiser un réseau | Réseaux internes via VirtualBox, possibilité pfSense/GNS3 pour aller plus loin         |
-
-### ✅ APPREHENDER LA SÉCURITÉ
-
-| Critère                     | Réponse                                                                  |
-| --------------------------- | ------------------------------------------------------------------------ |
-| Terminologie sécurité       | IDS, journaux, pare-feu, accès par clé, hardening                        |
-| Connaissance réglementation | Possibilité d'intégrer RGPD, triade CIA                                  |
-| Démarche sécuritaire        | Pare-feu, désactivation SSH mot de passe, journaux, analyse              |
-| Zero Trust, IAM             | Accès restreints, utilisateurs définis, suppression de services inutiles |
-
