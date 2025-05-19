@@ -145,6 +145,14 @@ sudo less /var/log/suricata/fast.log
 
 ### 📈 Rapport quotidien
 
+Installer logwatch :
+
+```bash
+sudo dnf install logwatch 
+```
+
+Configurer logwatch :
+
 ```bash
 sudo logwatch --range today --detail high --service all --format text
 ```
