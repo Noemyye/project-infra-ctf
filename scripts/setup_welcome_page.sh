@@ -23,12 +23,60 @@ sudo tee $HTML_DIR/index.html > /dev/null <<EOF
         h1 { color: #007acc; }
     </style>
 </head>
-<body>
-    <h1>Bienvenue sur le serveur CTF 🚩</h1>
-    <p>Ce serveur héberge la plateforme CTFd accessible sur le port <strong>8000</strong>.</p>
-    <p>🔐 Les ports autorisés : 22 (SSH), 8000 (CTFd), $PORT (cette page)</p>
-    <p>📘 Pour commencer, allez sur : <a href="http://192.168.56.10:8000">CTFd</a></p>
-</body>
+<section>
+    <h2>🔐 Informations réseau</h2>
+    <ul>
+        <li><strong>Adresse IP :</strong> 192.168.56.10</li>
+        <li><strong>Ports ouverts :</strong> 22 (SSH), 8000 (CTFd), $PORT (page d'accueil)</li>
+    </ul>
+</section>
+
+<section>
+    <h2>⚙️ Plateforme CTFd</h2>
+    <p>Le serveur héberge <strong>CTFd</strong>, une plateforme de Capture The Flag personnalisable.</p>
+    <p>🔗 <a href="http://192.168.56.10:8000" target="_blank">Accéder à CTFd</a></p>
+    <p>📘 Documentation officielle : <a href="https://docs.ctfd.io" target="_blank">docs.ctfd.io</a></p>
+</section>
+
+<section>
+    <h2>🛠️ Outils de sécurité installés</h2>
+    <ul>
+        <li><strong>Suricata</strong> – IDS pour détecter les intrusions</li>
+        <li><strong>Firewalld</strong> – Configuration des ports et filtrage réseau</li>
+        <li><strong>Logwatch</strong> – Rapport quotidien des logs système</li>
+        <li><strong>Script d'intégrité</strong> – Vérifie les modifications de fichiers sensibles</li>
+    </ul>
+    <p>Commandes utiles :</p>
+    <ul>
+        <li><code>sudo less /var/log/suricata/fast.log</code> – Alertes Suricata</li>
+        <li><code>sudo logwatch --range today</code> – Rapport du jour</li>
+        <li><code>sudo firewall-cmd --list-all</code> – Vérifier les ports ouverts</li>
+    </ul>
+</section>
+
+<section>
+    <h2>🔎 Sécurité réseau & bonnes pratiques</h2>
+    <ul>
+        <li>Accès SSH limité par clé uniquement</li>
+        <li>Mot de passe désactivé pour SSH</li>
+        <li>Firewall restrictif avec uniquement les ports nécessaires ouverts</li>
+        <li>Utilisateurs avec privilèges limités</li>
+        <li>Utilisation du principe <strong>Zero Trust</strong></li>
+    </ul>
+</section>
+
+<section>
+    <h2>📁 Ressources utiles</h2>
+    <ul>
+        <li><a href="https://github.com/CTFd/CTFd" target="_blank">CTFd sur GitHub</a></li>
+        <li><a href="https://wiki.owasp.org" target="_blank">OWASP – Meilleures pratiques en sécurité</a></li>
+        <li><a href="https://www.rockylinux.org" target="_blank">Site officiel Rocky Linux</a></li>
+    </ul>
+</section>
+
+<footer>
+    <p>🎯 Projet cybersécurité – VM Rocky Linux | Par <em>Noémie Dublanc, Ingrid Lare, Maxime Isidore</em></p>
+</footer>
 </html>
 EOF
 
