@@ -16,9 +16,10 @@ Mettre en place un serveur CTF auto-hébergé sous Rocky Linux avec CTFd, puis l
 
 ## II. Déploiement de la plateforme CTF
 
-### (Facultatif) Execution de la page d'accueil
+### (Facultatif) Page d'accueil récapitulative
 
-Lancer le script bash pour déployer le serveur nginx pour avoir la page d'accueil récapitulative
+Un script permet de déployer une page web statique pour l'accueil :
+- [Script bash ici](./scripts/setup_welcome_page.sh)
 ```
 ./setup_welcome_page.sh
 ```
@@ -28,11 +29,17 @@ Lancer le script bash pour déployer le serveur nginx pour avoir la page d'accue
 ```bash
 git clone https://github.com/CTFd/CTFd.git
 cd CTFd
+```
+
+Pour une maintenance de ctfd toujours en ligne ajouter dans le docker compose : `restart: always` dans le service ctfd
+
+Puis :
+```
 sudo docker compose up -d
 ```
 
 * Accès à la plateforme via `http://192.168.56.10:8000`
-* Création d'un compte administrateur
+* Création d'un compte administrateur à la première connexion
 
 ### ✅ Vérification
 
@@ -53,23 +60,26 @@ ssh-keygen
 type $env:USERPROFILE\.ssh\id_rsa.pub
 ```
 
-Sur le serveur Rocky, copier manuellement la clé public que vous venez d'afficher dans le fichier (authorized_keys) et lui changer les permissions pour plus de sécurité ::
-
+Sur le serveur Rocky Linux, copier la clé publique affichée précédemment :
 ```bash
 mkdir -p ~/.ssh
 nano ~/.ssh/authorized_keys
+```
+
+Et sécuriser les permissions :
+```
 chmod 600 ~/.ssh/authorized_keys
 chmod 700 ~/.ssh
 ```
 
 ### 2) Désactivation de l'accès SSH par mot de passe
 
+Éditez la configuration SSH :
 ```bash
 sudo nano /etc/ssh/sshd_config
 ```
 
 Modifier/Ajouter les lignes suivantes :
-
 ```
 PasswordAuthentication no
 ChallengeResponseAuthentication no
@@ -78,7 +88,6 @@ PubkeyAuthentication yes ⚠️(Très important pour autoriser la clé)
 ```
 
 Redémarrer le service :
-
 ```bash
 sudo systemctl restart sshd
 ```
@@ -86,6 +95,7 @@ sudo systemctl restart sshd
 ### 3) Pare-feu
 
 ```bash
+# Activation du service :
 sudo systemctl enable firewalld --now
 
 # Suppression des services par défaut
@@ -94,8 +104,9 @@ sudo firewall-cmd --permanent --remove-service=http
 sudo firewall-cmd --permanent --remove-service=https
 
 # Autoriser les ports nécessaires
-sudo firewall-cmd --permanent --add-port=22/tcp
-sudo firewall-cmd --permanent --add-port=8000/tcp
+sudo firewall-cmd --permanent --add-port=22/tcp     # SSH par clé
+sudo firewall-cmd --permanent --add-port=8080/tcp   # Port alternatif éventuel
+sudo firewall-cmd --permanent --add-port=8000/tcp   # Port de CTFd
 
 # Appliquer et vérifier
 sudo firewall-cmd --reload
@@ -114,21 +125,60 @@ sudo dnf install suricata -y
 sudo systemctl enable --now suricata
 ```
 
-Configurer l'interface réseau :
-
+Configurer l'interface réseau sur laquelle on veut vérifier (ici enp0s3):
 ```bash
-sudo -i
-nano /etc/sysconfig/suricata
+sudo nano /etc/sysconfig/suricata
 
 # Modifier la ligne options pour qu'elle corresponde à ça :
 OPTIONS="-i enp0s3"
 ```
 
 Redémarrer le service :
-
 ```bash
 sudo systemctl restart suricata
 sudo systemctl status suricata
+```
+
+### Mise en place d'un IDS simple
+
+📂 Fichiers surveillés :
+- /etc/ssh/sshd_config
+
+- /etc/firewalld
+
+- /etc/nginx/nginx.conf
+
+- /etc/sudoers
+
+- /etc/passwd
+
+- /etc/shadow
+
+Créer le script :
+```
+sudo nano /usr/local/bin/check_integrity.sh
+```
+
+Copier le contenu :
+- [Script bash ici](./scripts/check_integrity.sh)
+
+Donne les permissions d’exécution :
+```
+sudo chmod +x /usr/local/bin/check_integrity.sh
+```
+
+Planifier une vérification toutes les 5 minutes via cron :
+```bash
+sudo crontab -e
+
+# Copier ca :
+*/5 * * * * /usr/local/bin/check_integrity.sh
+```
+
+### Logwatch en plus
+
+```bash
+sudo dnf install logwatch -y
 ```
 
 ---
@@ -143,15 +193,7 @@ sudo less /var/log/messages
 sudo less /var/log/suricata/fast.log
 ```
 
-### 📈 Rapport quotidien
-
-Installer logwatch :
-
-```bash
-sudo dnf install logwatch 
-```
-
-Configurer logwatch :
+### 📈 Rapport quotidien avec logwatch
 
 ```bash
 sudo logwatch --range today --detail high --service all --format text
@@ -159,9 +201,14 @@ sudo logwatch --range today --detail high --service all --format text
 
 ### 📄 Script de résumé des attaques
 
+Si un script resume_scripts.sh a été défini, vous pouvez le copier et l'utiliser comme suit :
+- [Script bash ici](./scripts/resumer_scripts.sh)
 ```bash
-sudo ./rapport_resume.sh
+sudo chmod +x resume_scripts.sh
+sudo ./resume_scripts.sh
 ```
+
+Puis voir le fichier log qui répertorie les connexions ssh réussis ou échoués
 
 ---
 
@@ -175,61 +222,6 @@ sudo ./rapport_resume.sh
 ---
 
 ## 📊 Évaluation
-
-## Pentesting avec Kali Linux contre Rocky Linux
-
-1. Configuration de la machine Kali Linux
-
-    Hyperviseur : VirtualBox
-
-    Nom de la VM : kali-linux
-
-    Image : kali-linux-2024.X-amd64.iso
-
-    Type : Linux (Debian 64-bit)
-
-    RAM : 2 Go
-
-    CPU : 2 processeurs
-
-    Disque : VDI, 20 Go dynamique
-
-    Mode réseau : Réseau privé hôte (vboxnet0)
-
-    Installation : standard, partition unique, GRUB installé sur /dev/sda
-
-    Utilisateur : kali / kali
-
-
-    2. Mise à jour et installation des outils
-    sudo apt update && sudo apt upgrade -y
-    sudo apt install nmap nikto hydra dirb -y
-    
-
-    3. Résultats des scans Nmap sur la cible (192.168.56.10)
-    Port	État	Service	Version
-      22	ouvert	SSH	OpenSSH 8.7
-      80	fermé	HTTP	Serveur web non actif
-    9090	fermé	zeus-admin	Port fermé
-
-    4. Attaque brute-force SSH avec Hydra
-
-    Commande :
-    hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://192.168.56.10 -t 4
-
-    Hydra a lancé l’attaque brute-force sur le port SSH (22).
-
-    Le nombre de tentatives a augmenté régulièrement.
-
-    Interruption manuelle a sauvegardé la session dans hydra.restore.
-
-    5. Conclusion
-
-    Les scans et attaques sur le port SSH ont fonctionné, mais aucune compromission n’a été obtenue.
-
-    Le port 80 est fermé, empêchant les scans web (Nikto, Dirb).
-
-    L’attaque sur la machine Rocky Linux depuis Kali Linux n’a pas abouti.
 
 ### ✅ ADMINISTRER UN SERVEUR
 
