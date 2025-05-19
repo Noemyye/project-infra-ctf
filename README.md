@@ -218,10 +218,66 @@ Puis voir le fichier log qui répertorie les connexions ssh réussis ou échoué
 * **IAM** : gestion des comptes utilisateurs et accès limités
 * **VLAN** : possibilité de segmentation réseau via pfSense ou autres outils
 * **Automatisation** : Script d'installation, de hardening
+<<<<<<< HEAD
 
 ---
 
 ## 📊 Évaluation
+
+## Pentesting avec Kali Linux contre Rocky Linux
+
+1. Configuration de la machine Kali Linux
+
+    Hyperviseur : VirtualBox
+
+    Nom de la VM : kali-linux
+
+    Image : kali-linux-2024.X-amd64.iso
+
+    Type : Linux (Debian 64-bit)
+
+    RAM : 2 Go
+
+    CPU : 2 processeurs
+
+    Disque : VDI, 20 Go dynamique
+
+    Mode réseau : Réseau privé hôte (vboxnet0)
+
+    Installation : standard, partition unique, GRUB installé sur /dev/sda
+
+    Utilisateur : kali / kali
+
+
+    2. Mise à jour et installation des outils
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install nmap nikto hydra dirb -y
+    
+
+    3. Résultats des scans Nmap sur la cible (192.168.56.10)
+    Port	État	Service	Version
+      22	ouvert	SSH	OpenSSH 8.7
+      80	fermé	HTTP	Serveur web non actif
+    9090	fermé	zeus-admin	Port fermé
+
+    4. Attaque brute-force SSH avec Hydra
+
+    Commande :
+    hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://192.168.56.10 -t 4
+
+    Hydra a lancé l’attaque brute-force sur le port SSH (22).
+
+    Le nombre de tentatives a augmenté régulièrement.
+
+    Interruption manuelle a sauvegardé la session dans hydra.restore.
+
+    5. Conclusion
+
+    Les scans et attaques sur le port SSH ont fonctionné, mais aucune compromission n’a été obtenue.
+
+    Le port 80 est fermé, empêchant les scans web (Nikto, Dirb).
+
+    L’attaque sur la machine Rocky Linux depuis Kali Linux n’a pas abouti.
 
 ### ✅ ADMINISTRER UN SERVEUR
 
@@ -256,3 +312,5 @@ Puis voir le fichier log qui répertorie les connexions ssh réussis ou échoué
 | Démarche sécuritaire        | Pare-feu, désactivation SSH mot de passe, journaux, analyse              |
 | Zero Trust, IAM             | Accès restreints, utilisateurs définis, suppression de services inutiles |
 
+=======
+>>>>>>> 30294e810da44567fa89d43709a229bb724f1833
